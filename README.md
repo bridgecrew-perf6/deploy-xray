@@ -46,10 +46,13 @@ docker -v
 ```
 # 创建目录
 mkdir -p /usr/local/lib/docker/cli-plugins
+
 # 拉取官方compose v2文件
 curl -SL https://github.com/docker/compose/releases/download/v2.2.2/docker-compose-linux-x86_64 -o /usr/local/lib/docker/cli-plugins/docker-compose
+
 # 附上执行权限
 chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
 # 测试
 docker compose version
 ```
