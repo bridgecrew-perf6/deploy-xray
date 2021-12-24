@@ -1,0 +1,56 @@
+version: "3.9"
+services:
+  acme: 
+    image: neilpang/acme.sh
+    restart: always
+    container_name: ds-acme
+    command: daemon
+    environment:
+      - CF_Key="${CF_KEY}"
+      - CF_Email="${CF_EMAIL}"
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./acme:/acme.sh 
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2m"
+        max-file: "2"     
+  xray:
+    image: teddysun/xray
+    restart: always
+    container_name: ds-xray
+    network_mode: host
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./xray:/etc/xray      
+      - ./acme:/acme   
+    ports:
+      - "443:443"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2m"
+        max-file: "2"
+  nginx:
+    image: nginx:stable-alpine
+    restart: always
+    container_name: ds-nginx
+    working_dir: /var/www/html
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./wwwroot:/var/www/html
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./acme:/acme
+    depends_on:          
+      - xray
+    ports:
+      - "80:80"      
+      - "8001:8001"
+      - "8002:8002"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2m"
+        max-file: "2"
